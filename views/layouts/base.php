@@ -11,13 +11,14 @@ use yii\bootstrap4\Nav;
 use yii\bootstrap4\NavBar;
 
 AppAsset::register($this);
+
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>" class="h-100">
 
 <head>
-  <link rel="shortcut icon" href="./image/favicon.ico" type="image/x-icon">
+
   <link rel="stylesheet" href="./css/style.css" />
   <meta charset="<?= Yii::$app->charset ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">

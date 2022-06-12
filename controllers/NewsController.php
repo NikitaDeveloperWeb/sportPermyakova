@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\News;
+use app\models\NewsAdd;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -58,9 +60,40 @@ class NewsController extends Controller
    *
    * @return string
    */
-  public function actionNews()
-
+  public function actionNews($id)
   {
-    return $this->render('news');
+    $news = News::findOne($id);
+    return $this->render('news', ['news' => $news]);
+  }
+  /**
+   * Displays homepage.
+   *
+   * @return string
+   */
+  public function actionDeletenews($id)
+  {
+    $model = News::findOne($id);
+    if ($model) {
+      $model->delete();
+    }
+    return $this->redirect(['site/admin']);
+  }
+  /**
+   * Displays homepage.
+   *
+   * @return string
+   */
+  public function actionAddnews()
+  {
+    $userData = Yii::$app->user->identity;
+    $model = new NewsAdd();
+    $model->autor = $userData['id'];
+    if (isset($_POST['NewsAdd'])) {
+      $model->attributes = Yii::$app->request->post('NewsAdd');
+    }
+    if ($model->validate() &&  $model->Add()) {
+      return $this->redirect(['site/admin']);
+    }
+    return $this->render('addnews', ['model' => $model]);
   }
 }

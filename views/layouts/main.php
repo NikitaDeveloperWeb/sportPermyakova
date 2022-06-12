@@ -10,13 +10,17 @@ use yii\bootstrap4\Html;
 use yii\helpers\Url;
 
 AppAsset::register($this);
+
+
+
+$userData = Yii::$app->user->identity;
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>" class="h-100">
 
 <head>
-  <link rel="shortcut icon" href="@web/image/favicon.ico" type="image/x-icon">
+
   <!-- <link rel="stylesheet" href="'@web/css/style.css" /> -->
   <meta charset="<?= Yii::$app->charset ?>">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -28,52 +32,75 @@ AppAsset::register($this);
 <body>
   <?php $this->beginBody() ?>
   <div class="wrapper">
-    <header>
-      <span class="header-span">
-        <?= Html::img('@web/image/gumb.png', ['alt' => 'Удалить', 'class' => 'icon', 'onclick' => 'setStateElAside()', 'id' => 'gumb']); ?>
-        <a href=<?= Url::to(['site/dashbord/']); ?> class="logo">
-          <h1>F</h1>
-          inancier
+    <?php if ($userData) : ?>
+      <header>
+        <span class="header-span">
+
+          <a href=<?= Url::to(['site/']); ?> class="logo">
+            <h1>S</h1>
+            port
+          </a>
+        </span>
+        <span class="profile_preview" onclick="setStateEl()">
+          <div class="profile-intro">
+            <span class="profile-intro-span">
+              <div class="avatar">
+                <p><?= mb_substr($userData['firstname'], 0, 1) ?></p>
+              </div>
+              <div class="profile-intro__data">
+                <p><?= $userData['firstname'] ?></p>
+              </div>
+              <?= Html::img('@web/image/arrow_down.png', ['alt' => 'Удалить', 'class' => 'icon', 'id' => 'arrow']); ?>
+            </span>
+          </div>
+          <div class="profile-intro__menu">
+            <?php if ($userData['typeUser'] === 'User') : ?>
+              <a href=<?= Url::to(['users/profile']); ?>>Профиль</a>
+            <?php endif; ?>
+            <?php if ($userData && $userData['typeUser'] === 'Admin') : ?>
+              <a href=<?= Url::to(['site/admin']); ?>>Панель</a>
+            <?php endif; ?>
+            <?= Html::beginForm(['/users/logout'], 'post')
+              . Html::submitButton(
+                'Выход',
+                ['class' => '', 'style' => "color:red;border: none; display: flex; justify-content: center; padding: 0 !influence;"]
+              )
+              . Html::endForm() ?>
+          </div>
+        </span>
+      </header>
+    <? endif; ?>
+    <?php if (!$userData) : ?>
+      <header> <a href=<?= Url::to(['site/']); ?> class="logo">
+          <h1>S</h1>
+          port
         </a>
-      </span>
-      <span class="profile_preview" onclick="setStateEl()">
-        <div class="profile-intro">
-          <span class="profile-intro-span">
-            <div class="avatar">
-              <p>H</p>
-            </div>
-            <div class="profile-intro__data">
-              <p>Никита</p>
-            </div>
-            <?= Html::img('@web/image/arrow_down.png', ['alt' => 'Удалить', 'class' => 'icon', 'id' => 'arrow']); ?>
-          </span>
-        </div>
-        <div class="profile-intro__menu">
-          <a href=<?= Url::to(['users/profile']); ?>>Профиль</a>
-          <a href="#" class="warning">Выход</a>
-        </div>
-      </span>
-    </header>
+        <a href=<?= Url::to(['site/auth/']); ?> class="header-link">
+          Авторизация
+        </a>
+      </header>
+    <? endif; ?>
     <main>
       <div class="wrapper">
-
         <main>
-          <aside class="aside">
+          <?php if ($userData) : ?>
+            <aside class="aside">
 
-            <a href="<?= Url::to(['site/dashbord/']); ?>" id='news'>
-              <?= Html::img('@web/image/news.png', ['alt' => 'Новости']); ?>
-              <p>Новости</p>
-            </a>
-            <a href="<?= Url::to(['curse/curse/']); ?>" id='curse'>
-              <?= Html::img('@web/image/curse.png', ['alt' => 'Курсы']); ?>
-              <p>Курсы</p>
-            </a>
-            <a href="<?= Url::to(['words/words/']); ?>" id='words'>
-              <?= Html::img('@web/image/words.png', ['alt' => 'Слова']); ?>
-              <p>Словарь</p>
-            </a>
+              <a href="<?= Url::to(['site/dashbord/']); ?>" id='news'>
+                <!-- <?= Html::img('@web/image/news.png', ['alt' => 'Новости']); ?> -->
+                <p>Новости</p>
+              </a>
+              <a href="<?= Url::to(['invent/invent/']); ?>" id='invent'>
+                <!-- <?= Html::img('@web/image/curse.png', ['alt' => 'Курсы']); ?> -->
+                <p>Мероприятия</p>
+              </a>
+              <a href="<?= Url::to(['site/feedback/']); ?>" id='feed'>
+                <!-- <?= Html::img('@web/image/curse.png', ['alt' => 'Курсы']); ?> -->
+                <p>Обратная связь</p>
+              </a>
 
-          </aside>
+            </aside>
+          <?php endif; ?>
           <div class="content">
             <?= $content  ?>
           </div>
@@ -133,10 +160,9 @@ AppAsset::register($this);
           }
           // aside active
           let ACTIVE_ELEM = 0;
-          let ELEM_CURSE = document.querySelector('#curse');
-          let ELEM_WORDS = document.querySelector('#words');
+          let ELEM_INVENT = document.querySelector('#invent');
           let ELEM_NEWS = document.querySelector('#news');
-
+          let ELEM_feed = document.querySelector('#feed');
 
 
           let path = window.location.pathname;
@@ -144,9 +170,9 @@ AppAsset::register($this);
 
           if (path === '/web/site/dashbord') {
             ACTIVE_ELEM = 0
-          } else if (path === '/web/curse/curse') {
+          } else if (path === '/web/invent/invent') {
             ACTIVE_ELEM = 1
-          } else if (path === '/web/words/words') {
+          } else if (path === '/web/site/feedback') {
             ACTIVE_ELEM = 2
           }
 
@@ -155,18 +181,19 @@ AppAsset::register($this);
 
             if (ACTIVE_ELEM_NUMBER === 0) {
               ELEM_NEWS.classList.add('active');
-              ELEM_CURSE.classList.remove('active');
-              ELEM_WORDS.classList.remove('active');
+              ELEM_INVENT.classList.remove('active');
+              ELEM_feed.classList.remove('active');
+
+
             } else if (ACTIVE_ELEM_NUMBER === 1) {
               ELEM_NEWS.classList.remove('active');
-              ELEM_CURSE.classList.add('active');
-              ELEM_WORDS.classList.remove('active');
+              ELEM_INVENT.classList.add('active');
+              ELEM_feed.classList.remove('active');
 
             } else if (ACTIVE_ELEM_NUMBER === 2) {
               ELEM_NEWS.classList.remove('active');
-              ELEM_CURSE.classList.remove('active');
-              ELEM_WORDS.classList.add('active');
-
+              ELEM_feed.classList.add('active');
+              ELEM_INVENT.classList.remove('active');
             }
           }
 

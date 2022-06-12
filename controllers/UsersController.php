@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\User;
+use app\models\UserUpdate;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -63,17 +65,32 @@ class UsersController extends Controller
   {
     return $this->render('profile');
   }
-
+  /**
+   * @return User the loaded model
+   */
+  private function findUser()
+  {
+    return User::findOne(Yii::$app->user->identity->getId());
+  }
   /**
    * Displays homepage.
    *
    * @return string
    */
   public function actionEdituser()
-
   {
-    return $this->render('edituser');
+    $user = $this->findUser();
+    $model = new UserUpdate($user);
+
+    if ($model->load(Yii::$app->request->post()) && $model->update()) {
+      return $this->redirect(['users/profile']);
+    } else {
+      return $this->render('edituser', [
+        'model' => $model,
+      ]);
+    }
   }
+
 
 
   /**
@@ -84,7 +101,7 @@ class UsersController extends Controller
   public function actionLogout()
   {
     Yii::$app->user->logout();
-
-    return $this->goHome();
+    setcookie("Auth", "");
+    return $this->redirect(['/site/auth']);
   }
 }
